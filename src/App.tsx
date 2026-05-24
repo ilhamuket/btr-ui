@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { 
   Menu, X, Search, Play, MapPin, Calendar, Check, X as XIcon, 
-  Download, Info, ChevronDown, ChevronUp, User, Lock, Mail, Phone, FileText, Award, 
+  Download, Info, ChevronDown, User, Lock, Mail, Phone, FileText, Award, 
   AlertTriangle, ArrowRight, ArrowLeft, HeartPulse, Shirt, CreditCard, 
   Wallet, ShieldCheck, Box, Clock, Mountain, Droplets, Trophy, Users, 
-  Flag, Zap, MapPinned, Route, List, Tent, Star, CircleAlert, Ban, 
+  Flag, MapPinned, Route, List, Tent, Star, CircleAlert, Ban, 
   Stethoscope, Milestone, Scale, Gavel, HandHelping, Flame, Footprints
 } from 'lucide-react';
+
+import { type LucideIcon } from 'lucide-react';
 
 // --- TYPES ---
 type CategoryId = '100k' | '60k' | '30k' | '18k' | '7k';
@@ -38,6 +40,65 @@ interface Category {
 }
 
 type NavigateFn = (path: string, state?: NavState) => void;
+
+interface RuleItem {
+  id: string;
+  title: string;
+  icon: LucideIcon;
+  defaultOpen?: boolean;
+  content: string;
+}
+
+interface NavbarProps {
+  currentPath: string;
+  navigate: NavigateFn;
+  isScrolled: boolean;
+}
+
+interface FooterProps {
+  navigate: NavigateFn;
+}
+
+interface HomeViewProps {
+  navigate: NavigateFn;
+}
+
+interface CategoryDetailViewProps {
+  categoryId: string;
+  navigate: NavigateFn;
+}
+
+interface AccordionItemProps {
+  item: RuleItem;
+  isOpen: boolean;
+  toggle: () => void;
+}
+
+interface RaceInfoViewProps {
+  initialTab: string;
+  navigate: NavigateFn;
+}
+
+interface RegisterViewProps {
+  navigate: NavigateFn;
+}
+
+interface PaymentViewProps {
+  navigate: NavigateFn;
+  category: CategoryId;
+}
+
+interface NewsViewProps {
+  navigate: NavigateFn;
+}
+
+interface NewsDetailViewProps {
+  navigate: NavigateFn;
+}
+
+interface LoginViewProps {
+  navigate: NavigateFn;
+}
 
 // --- DATA ---
 const categoriesData: Record<CategoryId, Category> = {
@@ -106,7 +167,7 @@ const galleryImages: string[] = [
 ];
 
 // Rules & Regulations FAQ data
-const rulesData = [
+const rulesData: RuleItem[] = [
   {
     id: 'qualifications',
     title: 'Qualifications',
@@ -302,11 +363,11 @@ Crew members are responsible for their own safety and must follow all traffic ru
 // ==========================================
 // NAVBAR COMPONENT
 // ==========================================
-function Navbar({ currentPath, navigate, isScrolled }) {
+function Navbar({ currentPath, navigate, isScrolled }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [mobileDropdown, setMobileDropdown] = useState(null);
+  const [mobileDropdown, setMobileDropdown] = useState<string | null>(null);
 
-  const handleNav = (path) => {
+  const handleNav = (path: string) => {
     navigate(path);
     setIsMobileMenuOpen(false);
     setMobileDropdown(null);
@@ -434,7 +495,7 @@ function Navbar({ currentPath, navigate, isScrolled }) {
 // ==========================================
 // FOOTER COMPONENT
 // ==========================================
-function Footer({ navigate }) {
+function Footer({ navigate }: FooterProps) {
   return (
     <div className="bg-black">
       <section className="bg-zinc-950 py-16 border-t border-zinc-900">
@@ -473,7 +534,7 @@ function Footer({ navigate }) {
 // ==========================================
 // HOME VIEW (unchanged)
 // ==========================================
-function HomeView({ navigate }) {
+function HomeView({ navigate }: HomeViewProps) {
   return (
     <div className="animate-fade-in -mt-24">
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -497,7 +558,7 @@ function HomeView({ navigate }) {
         <div className="max-w-[1500px] mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-0 shadow-2xl relative">
             {Object.values(categoriesData).map((cat, index) => (
-              <div key={cat.id} className={`bg-white text-black relative flex flex-col group overflow-hidden border-zinc-200 ${index !== 0 ? 'border-l lg:border-l-0 lg:border-l border-t lg:border-t-0' : 'border-t lg:border-t-0'}`}>
+              <div key={cat.id} className={`bg-white text-black relative flex flex-col group overflow-hidden border-zinc-200 ${index !== 0 ? 'border-l lg:border-l border-t lg:border-t-0' : 'border-t lg:border-t-0'}`}>
                 <div className="h-[250px] w-full overflow-hidden"><img src={cat.img} alt={cat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" /></div>
                 <div className="p-6 flex flex-col flex-grow z-10 relative bg-white">
                   <div className="text-center font-black mb-6 flex flex-col items-center">
@@ -566,8 +627,8 @@ function HomeView({ navigate }) {
 // ==========================================
 // CATEGORY DETAIL VIEW (IMPROVED)
 // ==========================================
-function CategoryDetailView({ categoryId, navigate }) {
-  const cat = categoriesData[categoryId] ?? categoriesData['100k'];
+function CategoryDetailView({ categoryId, navigate }: CategoryDetailViewProps) {
+  const cat = categoriesData[categoryId as CategoryId] ?? categoriesData['100k'];
   const [activeTab, setActiveTab] = useState('course');
 
   const tabItems = [
@@ -870,7 +931,7 @@ function CategoryDetailView({ categoryId, navigate }) {
         {/* CTA */}
         <div className="text-center mb-8">
           <button onClick={() => navigate('register', { category: cat.id })} className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black py-5 px-16 text-lg uppercase tracking-[0.15em] transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] skew-x-[-10deg]">
-            <span className="skew-x-[10deg] block flex items-center">Register for {cat.name} <ArrowRight size={20} className="ml-3"/></span>
+            <span className="skew-x-[10deg] flex items-center">Register for {cat.name} <ArrowRight size={20} className="ml-3"/></span>
           </button>
         </div>
       </div>
@@ -882,7 +943,7 @@ function CategoryDetailView({ categoryId, navigate }) {
 // ==========================================
 // ACCORDION COMPONENT for Rules
 // ==========================================
-function AccordionItem({ item, isOpen, toggle }) {
+function AccordionItem({ item, isOpen, toggle }: AccordionItemProps) {
   const Icon = item.icon;
   return (
     <div className={`border border-white/10 rounded-xl overflow-hidden transition-all mb-3 ${isOpen ? 'bg-zinc-900/50 border-red-600/30 shadow-[0_0_20px_rgba(220,38,38,0.1)]' : 'bg-zinc-950 hover:border-white/20'}`}>
@@ -925,7 +986,7 @@ function AccordionItem({ item, isOpen, toggle }) {
 // ==========================================
 // RACE INFO VIEW (IMPROVED)
 // ==========================================
-function RaceInfoView({ initialTab, navigate }) {
+function RaceInfoView({ initialTab, navigate }: RaceInfoViewProps) {
   const [activeTab, setActiveTab] = useState(initialTab || 'venue');
   const [openRules, setOpenRules] = useState(['qualifications']);
 
@@ -947,7 +1008,7 @@ function RaceInfoView({ initialTab, navigate }) {
 
   useEffect(() => { setActiveTab(initialTab || 'venue'); }, [initialTab]);
 
-  const toggleRule = (id) => {
+  const toggleRule = (id: string) => {
     setOpenRules(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
@@ -1211,7 +1272,7 @@ function RaceInfoView({ initialTab, navigate }) {
                 <Download size={40} className="text-red-500" />
               </div>
               <h2 className="text-2xl font-black uppercase text-white mb-2">
-                Download {activeTab.replace('dl-', '').replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                Download {activeTab.replace('dl-', '').replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
               </h2>
               <p className="text-zinc-500 mb-8 max-w-md font-light">The official document for this section is available for download. Please review it carefully before race day.</p>
               <button className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-4 px-10 rounded-xl flex items-center uppercase tracking-widest transition-transform hover:scale-105 shadow-[0_0_20px_rgba(220,38,38,0.3)]">
@@ -1229,9 +1290,9 @@ function RaceInfoView({ initialTab, navigate }) {
 // ==========================================
 // REGISTER VIEW
 // ==========================================
-function RegisterView({ navigate }) {
-  const [formData, setFormData] = useState({ category: '100k' });
-  const handleProceed = (e) => { e.preventDefault(); navigate('payment', { category: formData.category }); };
+function RegisterView({ navigate }: RegisterViewProps) {
+  const [formData, setFormData] = useState<{ category: CategoryId }>({ category: '100k' });
+  const handleProceed = (e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); navigate('payment', { category: formData.category }); };
 
   return (
     <div className="animate-fade-in max-w-5xl mx-auto px-4 py-16">
@@ -1239,7 +1300,7 @@ function RegisterView({ navigate }) {
       <div className="bg-zinc-950 border border-white/10 p-8 md:p-12 rounded-2xl shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-800 via-red-600 to-red-800"></div>
         <form className="space-y-10" onSubmit={handleProceed}>
-          <div><h3 className="text-xl font-black uppercase text-white mb-6 flex items-center border-b border-white/10 pb-4"><Award className="text-red-600 mr-3" /> 1. Select Category</h3><div className="grid grid-cols-2 md:grid-cols-5 gap-4">{Object.values(categoriesData).map(c => (<label key={c.id} className={`cursor-pointer border rounded-xl p-4 text-center transition-all ${formData.category === c.id ? 'bg-red-600/10 border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)]' : 'bg-black border-white/10 hover:border-white/30'}`}><input type="radio" name="category" value={c.id} checked={formData.category === c.id} onChange={(e) => setFormData({...formData, category: e.target.value})} className="hidden" /><div className="font-black italic text-lg text-white">{c.name}</div><div className="text-[10px] text-zinc-400 font-bold uppercase mt-1">IDR {c.priceLocal}</div></label>))}</div></div>
+          <div><h3 className="text-xl font-black uppercase text-white mb-6 flex items-center border-b border-white/10 pb-4"><Award className="text-red-600 mr-3" /> 1. Select Category</h3><div className="grid grid-cols-2 md:grid-cols-5 gap-4">{Object.values(categoriesData).map(c => (<label key={c.id} className={`cursor-pointer border rounded-xl p-4 text-center transition-all ${formData.category === c.id ? 'bg-red-600/10 border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)]' : 'bg-black border-white/10 hover:border-white/30'}`}><input type="radio" name="category" value={c.id} checked={formData.category === c.id} onChange={(e) => setFormData({...formData, category: e.target.value as CategoryId})} className="hidden" /><div className="font-black italic text-lg text-white">{c.name}</div><div className="text-[10px] text-zinc-400 font-bold uppercase mt-1">IDR {c.priceLocal}</div></label>))}</div></div>
           <div><h3 className="text-xl font-black uppercase text-white mb-6 flex items-center border-b border-white/10 pb-4"><User className="text-red-600 mr-3" /> 2. Personal Information</h3><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">First Name *</label><input required type="text" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Last Name *</label><input required type="text" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Email *</label><input required type="email" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Phone (WhatsApp) *</label><input required type="tel" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">ID / Passport *</label><input required type="text" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">City (Asal Kota) *</label><input required type="text" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Community / Club</label><input type="text" placeholder="Optional" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">T-Shirt Size *</label><select required className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 outline-none appearance-none"><option value="">Select</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select></div></div></div>
           <div><h3 className="text-xl font-black uppercase text-white mb-6 flex items-center border-b border-white/10 pb-4"><HeartPulse className="text-red-600 mr-3" /> 3. Medical & Emergency</h3><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Blood Type *</label><select required className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 outline-none appearance-none"><option value="">Select</option><option>A</option><option>B</option><option>AB</option><option>O</option></select></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Allergies / Medical</label><input type="text" placeholder="Leave blank if none" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 outline-none" /></div><div className="md:col-span-2 border border-red-900/30 bg-red-950/10 p-6 rounded-xl mt-2"><h4 className="text-red-500 font-bold uppercase text-xs tracking-widest mb-4">Emergency Contact</h4><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Name *</label><input required type="text" className="w-full bg-black border border-white/10 rounded-lg p-3 text-white focus:border-red-500 outline-none" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Phone *</label><input required type="tel" className="w-full bg-black border border-white/10 rounded-lg p-3 text-white focus:border-red-500 outline-none" /></div></div></div></div></div>
           <div className="pt-8 flex justify-end"><button type="submit" className="w-full md:w-auto bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black py-4 px-12 rounded-xl text-lg uppercase tracking-widest shadow-[0_10px_20px_rgba(220,38,38,0.3)] transition-all transform hover:-translate-y-1 flex items-center justify-center">Proceed to Payment <ArrowRight size={20} className="ml-3" /></button></div>
@@ -1252,7 +1313,7 @@ function RegisterView({ navigate }) {
 // ==========================================
 // PAYMENT VIEW
 // ==========================================
-function PaymentView({ navigate, category }) {
+function PaymentView({ navigate, category }: PaymentViewProps) {
   const cat = categoriesData[category] ?? categoriesData['100k'];
   const adminFee = 25000;
   const rawPrice = parseInt(cat.priceLocal.replace(/\./g, ''), 10);
@@ -1317,7 +1378,7 @@ function ResultsView() {
 // ==========================================
 // NEWS VIEW
 // ==========================================
-function NewsView({ navigate }) {
+function NewsView({ navigate }: NewsViewProps) {
   const newsData = [
     { id: 1, date: '14 May 2026', title: 'Dani Chika Siap Taklukkan 60 Kilometer BTR Ultra 2026; Langkah Serius Menuju Trail Jepang', img: 'https://images.unsplash.com/photo-1542223189-67a03fa0f0bd?auto=format&fit=crop&q=80&w=600' },
     { id: 2, date: '14 May 2026', title: 'Atlet Pelari Indonesia Kuasai Podium Kategori 30 Kilometer Bali Trail Running', img: 'https://images.unsplash.com/photo-1533202998083-d52ec1eb311b?auto=format&fit=crop&q=80&w=600' },
@@ -1339,7 +1400,7 @@ function NewsView({ navigate }) {
   );
 }
 
-function NewsDetailView({ navigate }) {
+function NewsDetailView({ navigate }: NewsDetailViewProps) {
   return (
     <div className="animate-fade-in bg-white text-black min-h-screen -mt-24 pt-24 pb-20">
       <div className="max-w-4xl mx-auto px-4">
@@ -1390,10 +1451,10 @@ function ContactView() {
 // ==========================================
 // LOGIN VIEW
 // ==========================================
-function LoginView({ navigate }) {
+function LoginView({ navigate }: LoginViewProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const handleLogin = (e) => { e.preventDefault(); alert(`Login berhasil! Selamat datang, ${email}`); navigate('home'); };
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); alert(`Login berhasil! Selamat datang, ${email}`); navigate('home'); };
 
   return (
     <div className="animate-fade-in flex items-center justify-center min-h-[75vh] px-4">
@@ -1419,9 +1480,9 @@ function LoginView({ navigate }) {
 export default function BtrUltraApp() {
   const [currentPath, setCurrentPath] = useState('home');
   const [isScrolled, setIsScrolled] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('100k');
+  const [selectedCategory, setSelectedCategory] = useState<CategoryId>('100k');
 
-  const navigate = (path, state) => {
+  const navigate: NavigateFn = (path, state) => {
     if (state?.category) setSelectedCategory(state.category);
     setCurrentPath(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
