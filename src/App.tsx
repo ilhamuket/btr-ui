@@ -1,13 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  Menu, X, Search, Play, ChevronRight, MapPin, Calendar, Check, X as XIcon, 
+  Menu, X, Search, Play, MapPin, Calendar, Check, X as XIcon, 
   Download, Info, ChevronDown, User, Lock, Mail, Phone, FileText, Award, 
   AlertTriangle, ArrowRight, ArrowLeft, HeartPulse, Shirt, CreditCard, 
   Wallet, ShieldCheck, Box, Clock, Mountain
 } from 'lucide-react';
 
+// --- TYPES ---
+type CategoryId = '100k' | '60k' | '30k' | '18k' | '7k';
+type NavState = { category?: CategoryId };
+
+interface Category {
+  id: CategoryId;
+  name: string;
+  title: string;
+  dist: string;
+  elev: string;
+  cot: string;
+  priceLocal: string;
+  priceForeign: string;
+  utmb: string;
+  mountain: string;
+  itra: string;
+  color: string;
+  textColor: string;
+  img: string;
+}
+
+type NavigateFn = (path: string, state?: NavState) => void;
+
 // --- DATA DUMMY ---
-const categoriesData = {
+const categoriesData: Record<CategoryId, Category> = {
   '100k': { id: '100k', name: '100K', title: 'BTR ULTRA 100KM', dist: '106.20 KM', elev: '7.244 m+', cot: '34 hrs', priceLocal: '2.040.000', priceForeign: '2.140.000', utmb: '100M M', mountain: '10', itra: '5', color: 'bg-[#e3000f]', textColor: 'text-[#e3000f]', img: 'https://images.unsplash.com/photo-1542223189-67a03fa0f0bd?auto=format&fit=crop&q=80&w=600' },
   '60k': { id: '60k', name: '60K', title: 'BTR ULTRA 60KM', dist: '61.30 KM', elev: '3.819 m+', cot: '19 hrs', priceLocal: '1.740.000', priceForeign: '1.840.000', utmb: '100K M', mountain: '7', itra: '3', color: 'bg-[#7ac142]', textColor: 'text-[#7ac142]', img: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&q=80&w=600' },
   '30k': { id: '30k', name: '30K', title: 'BTR ULTRA 30KM', dist: '28.91 KM', elev: '1.205 m+', cot: '8 hrs', priceLocal: '1.240.000', priceForeign: '1.340.000', utmb: '20K M', mountain: '6', itra: '1', color: 'bg-[#f39200]', textColor: 'text-[#f39200]', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600' },
@@ -15,7 +38,7 @@ const categoriesData = {
   '7k': { id: '7k', name: '7K', title: 'BTR ULTRA 7KM', dist: '6.53 KM', elev: '257 m+', cot: '4 hrs', priceLocal: '640.000', priceForeign: '740.000', utmb: '-', mountain: '-', itra: '0', color: 'bg-[#d70071]', textColor: 'text-[#d70071]', img: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=600' },
 };
 
-const galleryImages = [
+const galleryImages: string[] = [
   "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
   "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
@@ -25,11 +48,17 @@ const galleryImages = [
 // ==========================================
 // NAVBAR COMPONENT
 // ==========================================
-function Navbar({ currentPath, navigate, isScrolled }) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [mobileDropdown, setMobileDropdown] = useState(null);
+interface NavbarProps {
+  currentPath: string;
+  navigate: NavigateFn;
+  isScrolled: boolean;
+}
 
-  const handleNav = (path) => {
+function Navbar({ currentPath, navigate, isScrolled }: NavbarProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileDropdown, setMobileDropdown] = useState<string | null>(null);
+
+  const handleNav = (path: string) => {
     navigate(path);
     setIsMobileMenuOpen(false);
     setMobileDropdown(null);
@@ -71,7 +100,7 @@ function Navbar({ currentPath, navigate, isScrolled }) {
             </div>
           </div>
 
-          {/* DESKTOP MENU (HOVER ENABLED) */}
+          {/* DESKTOP MENU */}
           <div className="hidden xl:flex items-center space-x-1 h-full">
             <button onClick={() => handleNav('home')} className={`px-4 py-6 text-[11px] font-black uppercase tracking-[0.15em] transition-colors relative group ${currentPath === 'home' ? 'text-red-500' : 'text-white hover:text-red-500'}`}>HOME<span className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-red-600 transition-all ${currentPath === 'home' ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}></span></button>
             
@@ -80,7 +109,6 @@ function Navbar({ currentPath, navigate, isScrolled }) {
               <button className={`flex items-center px-4 py-6 text-[11px] font-black uppercase tracking-[0.15em] transition-colors ${currentPath.startsWith('info-') ? 'text-red-500' : 'text-white group-hover:text-red-500'}`}>
                 RACE INFO <ChevronDown size={14} className="ml-1 opacity-70 group-hover:rotate-180 transition-transform duration-300" />
               </button>
-              {/* Dropdown Container with padding to prevent hover loss */}
               <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
                 <div className="w-64 bg-zinc-950 border border-zinc-800 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col py-2">
                   {raceInfoLinks.map((link) => (
@@ -132,7 +160,6 @@ function Navbar({ currentPath, navigate, isScrolled }) {
         <div className="pt-24 px-6 pb-20 flex flex-col space-y-2">
           <button onClick={() => handleNav('home')} className="w-full text-left text-sm font-black uppercase tracking-widest text-white py-4 border-b border-white/10">HOME</button>
           
-          {/* Mobile Race Info Accordion */}
           <div>
             <button onClick={() => setMobileDropdown(mobileDropdown === 'info' ? null : 'info')} className="w-full flex justify-between items-center text-sm font-black uppercase tracking-widest text-white py-4 border-b border-white/10">
               RACE INFO <ChevronDown size={18} className={`transform transition-transform duration-300 ${mobileDropdown === 'info' ? 'rotate-180 text-red-500' : ''}`} />
@@ -144,7 +171,6 @@ function Navbar({ currentPath, navigate, isScrolled }) {
             </div>
           </div>
 
-          {/* Mobile Categories Accordion */}
           <div>
             <button onClick={() => setMobileDropdown(mobileDropdown === 'cat' ? null : 'cat')} className="w-full flex justify-between items-center text-sm font-black uppercase tracking-widest text-white py-4 border-b border-white/10">
               CATEGORIES <ChevronDown size={18} className={`transform transition-transform duration-300 ${mobileDropdown === 'cat' ? 'rotate-180 text-red-500' : ''}`} />
@@ -170,7 +196,11 @@ function Navbar({ currentPath, navigate, isScrolled }) {
 // ==========================================
 // FOOTER COMPONENT
 // ==========================================
-function Footer({ navigate }) {
+interface FooterProps {
+  navigate: NavigateFn;
+}
+
+function Footer({ navigate }: FooterProps) {
   return (
     <div className="bg-black">
       <section className="bg-zinc-950 py-16 border-t border-zinc-900">
@@ -209,7 +239,11 @@ function Footer({ navigate }) {
 // ==========================================
 // HOME VIEW
 // ==========================================
-function HomeView({ navigate }) {
+interface HomeViewProps {
+  navigate: NavigateFn;
+}
+
+function HomeView({ navigate }: HomeViewProps) {
   return (
     <div className="animate-fade-in -mt-24">
       {/* HERO SECTION */}
@@ -240,35 +274,24 @@ function HomeView({ navigate }) {
             <button onClick={() => navigate('register')} className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black py-4 px-12 text-lg uppercase tracking-[0.15em] transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] skew-x-[-10deg]">
               <span className="skew-x-[10deg] block">Register Now</span>
             </button>
-            <button onClick={() => document.getElementById('categories').scrollIntoView({behavior: 'smooth'})} className="w-full sm:w-auto bg-black/50 backdrop-blur-md border-2 border-white/50 hover:bg-white hover:text-black hover:border-white text-white font-black py-4 px-12 text-lg uppercase tracking-[0.15em] transition-all duration-300 transform hover:scale-105 skew-x-[-10deg]">
-              <span className="skew-x-[10deg] block flex items-center justify-center">
-                 Categories
-              </span>
+            <button onClick={() => document.getElementById('categories')?.scrollIntoView({behavior: 'smooth'})} className="w-full sm:w-auto bg-black/50 backdrop-blur-md border-2 border-white/50 hover:bg-white hover:text-black hover:border-white text-white font-black py-4 px-12 text-lg uppercase tracking-[0.15em] transition-all duration-300 transform hover:scale-105 skew-x-[-10deg]">
+              <span className="skew-x-[10deg] block">Categories</span>
             </button>
           </div>
         </div>
       </section>
 
-      {/* CATEGORIES SECTION (REPLIKA PERSIS DARI SCREENSHOT) */}
+      {/* CATEGORIES SECTION */}
       <section className="bg-zinc-100 py-24 relative z-20 overflow-hidden" id="categories">
-        {/* Decorative Topographic Background */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c13.866 0 25.36 11.493 25.36 25.36 0 13.866-11.494 25.36-25.36 25.36C-2.866 68.72-14.36 57.226-14.36 43.36-14.36 29.493-2.866 18 11 18zm0-2c-14.97 0-27.36 12.39-27.36 27.36S-3.97 70.72 11 70.72c14.97 0 27.36-12.39 27.36-27.36S25.97 16 11 16zM50 50c13.866 0 25.36 11.493 25.36 25.36 0 13.866-11.494 25.36-25.36 25.36C36.134 100.72 24.64 89.226 24.64 75.36 24.64 61.493 36.134 50 50 50zm0-2c-14.97 0-27.36 12.39-27.36 27.36S35.03 102.72 50 102.72c14.97 0 27.36-12.39 27.36-27.36S64.97 48 50 48zm40-40c13.866 0 25.36 11.493 25.36 25.36 0 13.866-11.494 25.36-25.36 25.36C76.134 60.72 64.64 49.226 64.64 35.36 64.64 21.493 76.134 10 90 10zm0-2c-14.97 0-27.36 12.39-27.36 27.36S75.03 62.72 90 62.72c14.97 0 27.36-12.39 27.36-27.36S104.97 8 90 8z' fill='%23000' fill-rule='evenodd'/%3E%3C/svg%3E")` }}></div>
-        
         <div className="max-w-[1500px] mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-0 shadow-2xl relative">
             {Object.values(categoriesData).map((cat, index) => (
               <div key={cat.id} className={`bg-white text-black relative flex flex-col group overflow-hidden border-zinc-200 ${index !== 0 ? 'border-l lg:border-l-0 lg:border-l border-t lg:border-t-0' : 'border-t lg:border-t-0'}`}>
-                
-                {/* Topographic red pattern in corner */}
-                <div className="absolute -bottom-10 -right-10 w-40 h-40 opacity-20 pointer-events-none group-hover:scale-110 transition-transform duration-700" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e3000f' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")` }}></div>
-
-                {/* Top Image */}
                 <div className="h-[250px] w-full overflow-hidden">
                   <img src={cat.img} alt={cat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
                 </div>
 
                 <div className="p-6 flex flex-col flex-grow z-10 relative bg-white">
-                  {/* Title Block */}
                   <div className="text-center font-black mb-6 flex flex-col items-center">
                     <div className="text-lg tracking-tight uppercase">BTR ULTRA</div>
                     <div className={`mt-1 inline-block text-white px-5 py-0.5 italic transform -skew-x-12 shadow-md ${cat.color}`}>
@@ -276,7 +299,6 @@ function HomeView({ navigate }) {
                     </div>
                   </div>
 
-                  {/* Badges / ITRA Row */}
                   <div className="flex justify-between items-end border-b border-zinc-200 pb-3 mb-4">
                     <div className="text-center w-1/3">
                       <div className="text-[6px] text-zinc-400 font-bold uppercase tracking-widest mb-1">UTMB CATEGORY</div>
@@ -294,7 +316,6 @@ function HomeView({ navigate }) {
                     </div>
                   </div>
 
-                  {/* Distance & Elevation */}
                   <div className="flex justify-between mb-4">
                     <div>
                       <div className="text-[7px] text-zinc-400 font-bold uppercase tracking-widest">DISTANCE:</div>
@@ -306,13 +327,11 @@ function HomeView({ navigate }) {
                     </div>
                   </div>
                   
-                  {/* Cut-off Time */}
                   <div className="mb-6">
                      <div className="text-[7px] text-zinc-400 font-bold uppercase tracking-widest">CUT-OFF TIME:</div>
                      <div className="font-black text-xs">{cat.cot}</div>
                   </div>
 
-                  {/* Pricing */}
                   <div className="flex justify-between mb-6">
                     <div>
                       <div className="text-[7px] text-zinc-400 font-bold uppercase tracking-widest">PRICE LOCAL:</div>
@@ -324,7 +343,6 @@ function HomeView({ navigate }) {
                     </div>
                   </div>
 
-                  {/* Action Button */}
                   <div className="mt-auto pt-4 relative z-20">
                     <button onClick={() => navigate(`category-${cat.id}`)} className="bg-[#e3000f] hover:bg-red-700 text-white font-bold py-2.5 px-6 text-xs uppercase tracking-widest transition-colors shadow-md">
                       More Info
@@ -399,12 +417,16 @@ function HomeView({ navigate }) {
 }
 
 // ==========================================
-// REGISTER VIEW (COMPREHENSIVE)
+// REGISTER VIEW
 // ==========================================
-function RegisterView({ navigate }) {
-  const [formData, setFormData] = useState({ category: '100k' });
+interface RegisterViewProps {
+  navigate: NavigateFn;
+}
 
-  const handleProceed = (e) => {
+function RegisterView({ navigate }: RegisterViewProps) {
+  const [formData, setFormData] = useState<{ category: CategoryId }>({ category: '100k' });
+
+  const handleProceed = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     navigate('payment', { category: formData.category });
   };
@@ -429,7 +451,7 @@ function RegisterView({ navigate }) {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               {Object.values(categoriesData).map(c => (
                 <label key={c.id} className={`cursor-pointer border rounded-xl p-4 text-center transition-all ${formData.category === c.id ? 'bg-red-600/10 border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)]' : 'bg-black border-white/10 hover:border-white/30'}`}>
-                  <input type="radio" name="category" value={c.id} checked={formData.category === c.id} onChange={(e) => setFormData({...formData, category: e.target.value})} className="hidden" />
+                  <input type="radio" name="category" value={c.id} checked={formData.category === c.id} onChange={(e) => setFormData({...formData, category: e.target.value as CategoryId})} className="hidden" />
                   <div className="font-black italic text-lg text-white">{c.name}</div>
                   <div className="text-[10px] text-zinc-400 font-bold uppercase mt-1">IDR {c.priceLocal}</div>
                 </label>
@@ -452,7 +474,7 @@ function RegisterView({ navigate }) {
               <div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Community / Club Name</label><input type="text" placeholder="Optional" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div>
               <div>
                 <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">T-Shirt Size *</label>
-                <select className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all appearance-none">
+                <select required className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all appearance-none">
                   <option value="">Select Size</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option>
                 </select>
               </div>
@@ -496,10 +518,15 @@ function RegisterView({ navigate }) {
 // ==========================================
 // PAYMENT / CHECKOUT VIEW
 // ==========================================
-function PaymentView({ navigate, category }) {
-  const cat = categoriesData[category] || categoriesData['100k'];
+interface PaymentViewProps {
+  navigate: NavigateFn;
+  category: CategoryId;
+}
+
+function PaymentView({ navigate, category }: PaymentViewProps) {
+  const cat = categoriesData[category] ?? categoriesData['100k'];
   const adminFee = 25000;
-  const rawPrice = parseInt(cat.priceLocal.replace(/\./g, ''));
+  const rawPrice = parseInt(cat.priceLocal.replace(/\./g, ''), 10);
   const total = rawPrice + adminFee;
   
   const [paymentMethod, setPaymentMethod] = useState('va');
@@ -543,7 +570,6 @@ function PaymentView({ navigate, category }) {
              <h3 className="text-xl font-black uppercase text-white mb-6 flex items-center"><CreditCard className="text-red-600 mr-3" /> Select Payment Method</h3>
              
              <div className="space-y-4 mb-10">
-               {/* BCA VA */}
                <label className={`cursor-pointer border rounded-xl p-6 flex items-center transition-all ${paymentMethod === 'va' ? 'bg-red-600/10 border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)]' : 'bg-black border-white/10 hover:border-white/30'}`}>
                   <input type="radio" name="payment" checked={paymentMethod === 'va'} onChange={() => setPaymentMethod('va')} className="hidden" />
                   <div className="w-6 h-6 rounded-full border-2 border-zinc-600 flex items-center justify-center mr-4">
@@ -555,7 +581,6 @@ function PaymentView({ navigate, category }) {
                   </div>
                </label>
                
-               {/* Credit Card */}
                <label className={`cursor-pointer border rounded-xl p-6 flex items-center transition-all ${paymentMethod === 'cc' ? 'bg-red-600/10 border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)]' : 'bg-black border-white/10 hover:border-white/30'}`}>
                   <input type="radio" name="payment" checked={paymentMethod === 'cc'} onChange={() => setPaymentMethod('cc')} className="hidden" />
                   <div className="w-6 h-6 rounded-full border-2 border-zinc-600 flex items-center justify-center mr-4">
@@ -567,7 +592,6 @@ function PaymentView({ navigate, category }) {
                   </div>
                </label>
 
-               {/* QRIS */}
                <label className={`cursor-pointer border rounded-xl p-6 flex items-center transition-all ${paymentMethod === 'qris' ? 'bg-red-600/10 border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)]' : 'bg-black border-white/10 hover:border-white/30'}`}>
                   <input type="radio" name="payment" checked={paymentMethod === 'qris'} onChange={() => setPaymentMethod('qris')} className="hidden" />
                   <div className="w-6 h-6 rounded-full border-2 border-zinc-600 flex items-center justify-center mr-4">
@@ -592,9 +616,14 @@ function PaymentView({ navigate, category }) {
 }
 
 // ==========================================
-// RACE INFO VIEW (Comprehensive Details from PDF)
+// RACE INFO VIEW
 // ==========================================
-function RaceInfoView({ initialTab, navigate }) {
+interface RaceInfoViewProps {
+  initialTab: string;
+  navigate: NavigateFn;
+}
+
+function RaceInfoView({ initialTab, navigate }: RaceInfoViewProps) {
   const [activeTab, setActiveTab] = useState(initialTab || 'venue');
 
   const tabs = [
@@ -626,7 +655,7 @@ function RaceInfoView({ initialTab, navigate }) {
         <div className="w-full lg:w-72 flex-shrink-0">
           <div className="bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden sticky top-28 shadow-2xl">
             <div className="p-5 bg-black border-b border-white/10"><h3 className="text-zinc-500 font-bold uppercase tracking-[0.2em] text-[10px]">Directory Guide</h3></div>
-            <div className="max-h-[70vh] overflow-y-auto custom-scrollbar py-2">
+            <div className="max-h-[70vh] overflow-y-auto py-2">
               {tabs.map((t) => (
                 <button
                   key={t.id}
@@ -643,7 +672,6 @@ function RaceInfoView({ initialTab, navigate }) {
         {/* CONTENT AREA */}
         <div className="flex-grow bg-zinc-950 border border-white/10 rounded-2xl p-6 md:p-10 shadow-2xl min-h-[60vh]">
           
-          {/* VENUE */}
           {activeTab === 'venue' && (
             <div className="animate-fade-in">
               <h2 className="text-3xl font-black uppercase italic text-white mb-8 flex items-center"><MapPin className="text-red-600 mr-3" size={32}/> Race Venue</h2>
@@ -657,12 +685,11 @@ function RaceInfoView({ initialTab, navigate }) {
                  </div>
               </div>
               <div className="bg-black border border-white/10 p-6 rounded-xl">
-                <p className="text-zinc-300 leading-relaxed text-lg font-light">Batur Natural Hot Spring is located in Toya Bungkah, Kintamani, Bali. It's a popular spot for tourists and locals alike who want to relax and unwind in the natural hot springs while enjoying the beautiful views of Lake Batur and Mount Batur. The hot springs are believed to have healing properties and are rich in minerals that can help soothe sore muscles and joints.</p>
+                <p className="text-zinc-300 leading-relaxed text-lg font-light">Batur Natural Hot Spring is located in Toya Bungkah, Kintamani, Bali. It's a popular spot for tourists and locals alike who want to relax and unwind in the natural hot springs while enjoying the beautiful views of Lake Batur and Mount Batur.</p>
               </div>
             </div>
           )}
 
-          {/* SCHEDULE */}
           {activeTab === 'schedule' && (
             <div className="animate-fade-in">
               <h2 className="text-3xl font-black uppercase italic text-white mb-8 flex items-center"><Calendar className="text-red-600 mr-3" size={32}/> Event Schedule</h2>
@@ -677,7 +704,6 @@ function RaceInfoView({ initialTab, navigate }) {
                     </tr>
                   </thead>
                   <tbody className="text-sm">
-                    {/* Day 1 */}
                     <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
                       <td className="p-5 font-bold text-red-400">Thu, 14 May</td>
                       <td className="p-5 text-zinc-400">12:00 - 20:00</td>
@@ -690,17 +716,10 @@ function RaceInfoView({ initialTab, navigate }) {
                       <td className="p-5 font-bold text-white">Race Briefing BTRU 100K</td>
                       <td className="p-5 text-zinc-500 text-xs">Batur Hot Spring</td>
                     </tr>
-                    {/* Day 2 */}
                     <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
                       <td className="p-5 font-bold text-red-400">Fri, 15 May</td>
                       <td className="p-5 text-zinc-400">12:00 - 20:00</td>
                       <td className="p-5 font-bold text-white">Race Kit Collection Day 2</td>
-                      <td className="p-5 text-zinc-500 text-xs">Batur Hot Spring</td>
-                    </tr>
-                    <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="p-5 font-bold text-red-400">Fri, 15 May</td>
-                      <td className="p-5 text-zinc-400">12:00 - 18:00</td>
-                      <td className="p-5 font-bold text-white">Drop Bag Storage 100KM</td>
                       <td className="p-5 text-zinc-500 text-xs">Batur Hot Spring</td>
                     </tr>
                     <tr className="border-b border-white/10 bg-red-900/20 hover:bg-red-900/30 transition-colors">
@@ -709,7 +728,6 @@ function RaceInfoView({ initialTab, navigate }) {
                       <td className="p-5 font-black text-white text-lg tracking-wider">FLAG OFF BTRU 100K</td>
                       <td className="p-5 text-zinc-400 text-xs font-bold">Start Line</td>
                     </tr>
-                    {/* Day 3 */}
                     <tr className="border-b border-white/5 bg-red-900/20 hover:bg-red-900/30 transition-colors">
                       <td className="p-5 font-black text-red-500">Sat, 16 May</td>
                       <td className="p-5 font-black text-white">04:00 WITA</td>
@@ -728,11 +746,10 @@ function RaceInfoView({ initialTab, navigate }) {
             </div>
           )}
 
-          {/* GEAR */}
           {activeTab === 'gear' && (
             <div className="animate-fade-in">
               <h2 className="text-3xl font-black uppercase italic text-white mb-8 flex items-center"><ShieldCheck className="text-red-600 mr-3" size={32}/> Mandatory Gear</h2>
-              <p className="text-zinc-400 mb-6 font-light">To ensure your safety across the brutal volcanic terrains, the following gears are strictly mandatory. Gear checks will be performed.</p>
+              <p className="text-zinc-400 mb-6 font-light">The following gears are strictly mandatory. Gear checks will be performed.</p>
               <div className="bg-black border border-white/10 rounded-2xl overflow-x-auto shadow-lg">
                 <table className="w-full text-center border-collapse">
                   <thead><tr className="bg-zinc-900 border-b border-white/10"><th className="p-5 text-left text-[11px] font-black text-zinc-400 uppercase tracking-[0.1em]">Equipment Item</th><th className="p-5 text-[11px] font-black text-red-500 uppercase tracking-[0.1em]">7 KM</th><th className="p-5 text-[11px] font-black text-red-500 uppercase tracking-[0.1em]">18K / 30K</th><th className="p-5 text-[11px] font-black text-red-500 uppercase tracking-[0.1em]">60K / 100K</th></tr></thead>
@@ -744,12 +761,10 @@ function RaceInfoView({ initialTab, navigate }) {
                       { name: 'Energy Food / Bars', k7: 'Rec.', k18: true, k100: true },
                       { name: 'Personal First Aid Kit', k7: false, k18: true, k100: true },
                       { name: 'Running Pack / Vest', k7: 'Rec.', k18: true, k100: true },
-                      { name: 'GPX Map on Watch/Phone', k7: 'Rec.', k18: true, k100: true },
                       { name: 'Foldable Cup (No plastics)', k7: true, k18: true, k100: true },
                       { name: 'Waterproof Rain Jacket', k7: 'Rec.', k18: true, k100: true },
                       { name: 'Emergency Thermal Blanket', k7: false, k18: true, k100: true },
                       { name: 'Headlamp + Spare Battery', k7: false, k18: 'Rec.', k100: true },
-                      { name: 'Emergency Whistle', k7: 'Rec.', k18: 'Rec.', k100: 'Rec.' }
                     ].map((row, idx) => (
                       <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                         <td className="p-4 text-left font-bold text-white bg-black/50">{row.name}</td>
@@ -764,7 +779,6 @@ function RaceInfoView({ initialTab, navigate }) {
             </div>
           )}
 
-          {/* RPC */}
           {activeTab === 'rpc' && (
             <div className="animate-fade-in">
               <h2 className="text-3xl font-black uppercase italic text-white mb-8 flex items-center"><Box className="text-red-600 mr-3" size={32}/> Race Pack Collection</h2>
@@ -772,9 +786,9 @@ function RaceInfoView({ initialTab, navigate }) {
                 <div className="bg-black border border-white/10 p-8 rounded-2xl shadow-lg">
                   <h3 className="text-red-500 font-black uppercase tracking-widest text-sm mb-4 border-b border-white/10 pb-2">RPC Rules & Regulations</h3>
                   <ul className="space-y-4 text-sm text-zinc-300">
-                    <li className="flex items-start"><AlertTriangle size={16} className="text-yellow-500 mr-3 mt-0.5 shrink-0"/> <span>You <strong>must</strong> collect your own RPC. It cannot be represented, to ensure accountability and safety.</span></li>
-                    <li className="flex items-start"><AlertTriangle size={16} className="text-yellow-500 mr-3 mt-0.5 shrink-0"/> <span>Outside collection hours (12:00-20:00 WITA), pickup is available by reservation with an additional fee of <strong>IDR 100,000</strong>.</span></li>
-                    <li className="flex items-start"><Info size={16} className="text-blue-500 mr-3 mt-0.5 shrink-0"/> <span>For DNS (not starting), RPC can be shipped until 31 May 2026 with shipping costs paid by participant.</span></li>
+                    <li className="flex items-start"><AlertTriangle size={16} className="text-yellow-500 mr-3 mt-0.5 shrink-0"/> <span>You <strong>must</strong> collect your own RPC. It cannot be represented.</span></li>
+                    <li className="flex items-start"><AlertTriangle size={16} className="text-yellow-500 mr-3 mt-0.5 shrink-0"/> <span>Outside collection hours, pickup available by reservation with additional fee of <strong>IDR 100,000</strong>.</span></li>
+                    <li className="flex items-start"><Info size={16} className="text-blue-500 mr-3 mt-0.5 shrink-0"/> <span>For DNS, RPC can be shipped until 31 May 2026 with shipping costs paid by participant.</span></li>
                   </ul>
                 </div>
                 <div className="bg-red-950/20 border border-red-900/30 p-8 rounded-2xl shadow-lg">
@@ -785,13 +799,11 @@ function RaceInfoView({ initialTab, navigate }) {
                     <li className="flex items-center"><Check size={18} className="text-red-500 mr-3"/> Medical Health Certificate</li>
                     <li className="flex items-center"><Check size={18} className="text-red-500 mr-3"/> Signed Waiver & PAR-Q Form</li>
                   </ul>
-                  <button className="mt-6 w-full bg-red-600 text-white font-bold py-3 rounded text-xs uppercase tracking-widest hover:bg-red-700 transition-colors">Access QR Kit Tutorial</button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* MERCHANDISE */}
           {activeTab === 'merch' && (
             <div className="animate-fade-in">
               <h2 className="text-3xl font-black uppercase italic text-white mb-8 flex items-center"><Shirt className="text-red-600 mr-3" size={32}/> Official Merchandise</h2>
@@ -816,20 +828,18 @@ function RaceInfoView({ initialTab, navigate }) {
             </div>
           )}
 
-          {/* RULES (Basic) & MULTIPLE DOWNLOADS */}
           {(activeTab === 'rules' || activeTab === 'accommodation' || activeTab.startsWith('dl-')) && (
             <div className="animate-fade-in flex flex-col items-center justify-center min-h-[40vh] text-center bg-black border border-white/10 rounded-2xl p-10">
               <FileText size={80} className="text-zinc-800 mb-6" />
               <h2 className="text-2xl font-black uppercase text-white mb-2">
                 Section: {activeTab.replace('dl-', '').toUpperCase()}
               </h2>
-              <p className="text-zinc-500 mb-8 max-w-md font-light">The detailed file or document for this section is available for download. It contains official guidelines and forms for the 2026 event.</p>
+              <p className="text-zinc-500 mb-8 max-w-md font-light">The detailed file or document for this section is available for download.</p>
               <button className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-4 px-10 rounded-full flex items-center uppercase tracking-widest transition-transform hover:scale-105 shadow-[0_0_20px_rgba(220,38,38,0.3)]">
                 <Download size={20} className="mr-3" /> Download File
               </button>
             </div>
           )}
-
         </div>
       </div>
     </div>
@@ -839,8 +849,13 @@ function RaceInfoView({ initialTab, navigate }) {
 // ==========================================
 // CATEGORY DETAIL VIEW
 // ==========================================
-function CategoryDetailView({ categoryId, navigate }) {
-  const cat = categoriesData[categoryId] || categoriesData['100k'];
+interface CategoryDetailViewProps {
+  categoryId: string;
+  navigate: NavigateFn;
+}
+
+function CategoryDetailView({ categoryId, navigate }: CategoryDetailViewProps) {
+  const cat = categoriesData[categoryId as CategoryId] ?? categoriesData['100k'];
   
   return (
     <div className="animate-fade-in max-w-[1400px] mx-auto px-4 py-16">
@@ -931,7 +946,11 @@ function ResultsView() {
 // ==========================================
 // NEWS VIEW
 // ==========================================
-function NewsView({ navigate }) {
+interface NewsViewProps {
+  navigate: NavigateFn;
+}
+
+function NewsView({ navigate }: NewsViewProps) {
   const newsData = [
     { id: 1, date: '14 May 2026', title: 'Dani Chika Siap Taklukkan 60 Kilometer BTR Ultra 2026; Langkah Serius Menuju Trail Jepang', img: 'https://images.unsplash.com/photo-1542223189-67a03fa0f0bd?auto=format&fit=crop&q=80&w=600' },
     { id: 2, date: '14 May 2026', title: 'Atlet Pelari Indonesia Kuasai Podium Kategori 30 Kilometer Bali Trail Running', img: 'https://images.unsplash.com/photo-1533202998083-d52ec1eb311b?auto=format&fit=crop&q=80&w=600' },
@@ -942,7 +961,7 @@ function NewsView({ navigate }) {
   return (
     <div className="animate-fade-in max-w-7xl mx-auto px-4 py-16">
       <h1 className="text-5xl md:text-6xl font-black uppercase italic tracking-tighter text-center text-white mb-16">Latest <span className="text-red-600">News</span></h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {newsData.map((news) => (
           <div key={news.id} onClick={() => navigate('news-detail')} className="bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden group hover:border-red-600 transition-all shadow-xl cursor-pointer flex flex-col md:flex-row h-full">
              <div className="w-full md:w-2/5 h-64 md:h-auto overflow-hidden relative">
@@ -963,21 +982,22 @@ function NewsView({ navigate }) {
 // ==========================================
 // NEWS DETAIL VIEW
 // ==========================================
-function NewsDetailView({ navigate }) {
+interface NewsDetailViewProps {
+  navigate: NavigateFn;
+}
+
+function NewsDetailView({ navigate }: NewsDetailViewProps) {
   return (
     <div className="animate-fade-in bg-white text-black min-h-screen -mt-24 pt-24 pb-20">
        <div className="max-w-4xl mx-auto px-4">
          <button onClick={() => navigate('news')} className="text-zinc-500 hover:text-red-600 flex items-center mb-10 text-xs font-bold uppercase tracking-widest transition-colors"><ArrowLeft size={16} className="mr-2"/> Back to News</button>
-         
          <div className="text-red-600 font-bold text-xs uppercase tracking-widest mb-4">BTR ULTRA 2026 • 14 May 2026</div>
-         <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter leading-tight mb-8">Dani Chika Siap Taklukkan 60 Kilometer BTR Ultra 2026; Langkah Serius Menuju Trail Jepang</h1>
-         
+         <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter leading-tight mb-8">Dani Chika Siap Taklukkan 60 Kilometer BTR Ultra 2026</h1>
          <img src="https://images.unsplash.com/photo-1542223189-67a03fa0f0bd?auto=format&fit=crop&q=80&w=1200" className="w-full rounded-2xl mb-10 shadow-xl" alt="Dani Chika" />
-         
          <article className="prose prose-lg max-w-none text-zinc-700 font-serif leading-relaxed space-y-6">
-           <p className="text-xl font-medium">Menjelang start Bali Trail Run (BTR) Ultra 2026 di Kintamani, suasana basecamp sudah terasa menggeliat. Di antara ribuan peserta dari berbagai negara, nama Dani Chika mencuri perhatian.</p>
-           <p>Pelari trail berbakat ini menargetkan penyelesaian rute brutal 60 Kilometer yang mengelilingi Gunung Batur dan Gunung Abang. Elevasi yang sangat menantang serta cuaca ekstrem menjadi ujian utama yang harus dihadapinya. Persiapan intensif telah dilakukan selama enam bulan terakhir.</p>
-           <p>Ajang BTR Ultra tahun ini juga menjadi batu loncatan baginya untuk mengumpulkan poin ITRA demi kualifikasi lomba trail bergengsi di Jepang tahun depan. Keikutsertaannya tidak hanya membanggakan komunitas pelari lokal, tetapi juga menjadi inspirasi bagi generasi muda pegiat olahraga lari ekstrem di Indonesia.</p>
+           <p className="text-xl font-medium">Menjelang start Bali Trail Run (BTR) Ultra 2026 di Kintamani, suasana basecamp sudah terasa menggeliat.</p>
+           <p>Pelari trail berbakat ini menargetkan penyelesaian rute brutal 60 Kilometer yang mengelilingi Gunung Batur dan Gunung Abang. Persiapan intensif telah dilakukan selama enam bulan terakhir.</p>
+           <p>Ajang BTR Ultra tahun ini juga menjadi batu loncatan baginya untuk mengumpulkan poin ITRA demi kualifikasi lomba trail bergengsi di Jepang tahun depan.</p>
          </article>
        </div>
     </div>
@@ -985,7 +1005,7 @@ function NewsDetailView({ navigate }) {
 }
 
 // ==========================================
-// GALLERY, CONTACT, LOGIN VIEWS
+// GALLERY VIEW
 // ==========================================
 function GalleryPageView() {
   const images = [
@@ -1008,23 +1028,12 @@ function GalleryPageView() {
       <h1 className="text-5xl md:text-6xl font-black uppercase italic tracking-tighter text-center text-white mb-16">
         Official <span className="text-red-600">Gallery</span>
       </h1>
-
       <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
         {images.map((id, i) => (
-          <div
-            key={i}
-            className="relative group overflow-hidden rounded-xl break-inside-avoid cursor-pointer shadow-lg"
-          >
-            <img
-              src={`https://images.unsplash.com/${id}?auto=format&fit=crop&w=600&q=80`}
-              className="w-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
-              alt="Gallery"
-            />
-
+          <div key={i} className="relative group overflow-hidden rounded-xl break-inside-avoid cursor-pointer shadow-lg">
+            <img src={`https://images.unsplash.com/${id}?auto=format&fit=crop&w=600&q=80`} className="w-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" alt="Gallery" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-              <span className="text-white font-bold text-sm tracking-wider uppercase">
-                View Photo
-              </span>
+              <span className="text-white font-bold text-sm tracking-wider uppercase">View Photo</span>
             </div>
           </div>
         ))}
@@ -1033,6 +1042,9 @@ function GalleryPageView() {
   );
 }
 
+// ==========================================
+// CONTACT VIEW
+// ==========================================
 function ContactView() {
   return (
     <div className="animate-fade-in max-w-5xl mx-auto px-4 py-16">
@@ -1041,7 +1053,7 @@ function ContactView() {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 bg-zinc-950 border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
          <div className="p-12 bg-black border-r border-white/5 flex flex-col justify-center">
-            <h3 className="text-2xl font-black uppercase mb-8 tracking-wider">Get in Touch</h3>
+            <h3 className="text-2xl font-black uppercase mb-8 tracking-wider text-white">Get in Touch</h3>
             <div className="space-y-8">
               <div className="flex items-start"><MapPin className="text-red-600 mr-5 mt-1 shrink-0" size={24}/><p className="text-zinc-400 font-light leading-relaxed">Jl. Gunung Andakasa No. 22, Kelurahan Padangsambian, Denpasar Barat 80118</p></div>
               <div className="flex items-center"><Mail className="text-red-600 mr-5 shrink-0" size={24}/><p className="text-zinc-300 font-bold">balitrailrunning@gmail.com</p></div>
@@ -1049,19 +1061,32 @@ function ContactView() {
             </div>
          </div>
          <div className="p-12 bg-zinc-950">
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <div className="space-y-6">
                <div><input type="text" placeholder="Full Name" className="w-full bg-black border border-white/10 rounded-xl p-4 text-white focus:border-red-500 outline-none text-sm font-light transition-colors"/></div>
                <div><input type="email" placeholder="Email Address" className="w-full bg-black border border-white/10 rounded-xl p-4 text-white focus:border-red-500 outline-none text-sm font-light transition-colors"/></div>
-               <div><textarea placeholder="Your Message..." rows="5" className="w-full bg-black border border-white/10 rounded-xl p-4 text-white focus:border-red-500 outline-none text-sm font-light transition-colors resize-none"></textarea></div>
+               <div><textarea placeholder="Your Message..." rows={5} className="w-full bg-black border border-white/10 rounded-xl p-4 text-white focus:border-red-500 outline-none text-sm font-light transition-colors resize-none"></textarea></div>
                <button className="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl uppercase tracking-[0.2em] text-sm transition-transform hover:-translate-y-1 shadow-[0_10px_20px_rgba(220,38,38,0.3)]">Send Message</button>
-            </form>
+            </div>
          </div>
       </div>
     </div>
   );
 }
 
-function LoginView() {
+// ==========================================
+// LOGIN VIEW
+// ==========================================
+function LoginView({ navigate }: { navigate: NavigateFn }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Demo: redirect to home after login
+    alert(`Login berhasil! Selamat datang, ${email}`);
+    navigate('home');
+  };
+
   return (
     <div className="animate-fade-in flex items-center justify-center min-h-[75vh] px-4">
       <div className="bg-zinc-950 border border-white/10 p-12 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md relative overflow-hidden">
@@ -1070,36 +1095,60 @@ function LoginView() {
           <div className="text-5xl font-black italic tracking-tighter text-white mb-3">BTR<span className="text-red-600">ULTRA</span></div>
           <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Sign in to your runner account</p>
         </div>
-        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-6" onSubmit={handleLogin}>
           <div className="relative">
             <User className="absolute left-4 top-4 text-zinc-500" size={20}/>
-            <input type="email" placeholder="Email Address" className="w-full bg-black border border-white/10 rounded-xl p-4 pl-14 text-white focus:border-red-500 outline-none text-sm font-light transition-colors"/>
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full bg-black border border-white/10 rounded-xl p-4 pl-14 text-white focus:border-red-500 outline-none text-sm font-light transition-colors"
+            />
           </div>
           <div className="relative">
             <Lock className="absolute left-4 top-4 text-zinc-500" size={20}/>
-            <input type="password" placeholder="Password" className="w-full bg-black border border-white/10 rounded-xl p-4 pl-14 text-white focus:border-red-500 outline-none text-sm font-light transition-colors"/>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full bg-black border border-white/10 rounded-xl p-4 pl-14 text-white focus:border-red-500 outline-none text-sm font-light transition-colors"
+            />
           </div>
           <div className="flex justify-between items-center text-xs text-zinc-400 font-bold">
-            <label className="flex items-center cursor-pointer hover:text-white transition-colors"><input type="checkbox" className="mr-3 accent-red-600 w-4 h-4"/> Remember me</label>
-            <a href="#" className="hover:text-red-500 transition-colors">Forgot password?</a>
+            <label className="flex items-center cursor-pointer hover:text-white transition-colors">
+              <input type="checkbox" className="mr-3 accent-red-600 w-4 h-4"/> Remember me
+            </label>
+            <button type="button" className="hover:text-red-500 transition-colors">Forgot password?</button>
           </div>
-          <button className="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl uppercase tracking-[0.2em] text-sm transition-transform hover:-translate-y-1 shadow-[0_10px_20px_rgba(220,38,38,0.3)] mt-6">Login to Portal</button>
+          <button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl uppercase tracking-[0.2em] text-sm transition-transform hover:-translate-y-1 shadow-[0_10px_20px_rgba(220,38,38,0.3)] mt-6">
+            Login to Portal
+          </button>
         </form>
-        <p className="text-center text-xs text-zinc-500 mt-8 font-bold uppercase tracking-widest">Don't have an account? <a href="#" className="text-red-500 hover:text-white transition-colors ml-1">Sign up</a></p>
+        <p className="text-center text-xs text-zinc-500 mt-8 font-bold uppercase tracking-widest">
+          Don't have an account?{' '}
+          <button onClick={() => navigate('register')} className="text-red-500 hover:text-white transition-colors ml-1">
+            Sign up
+          </button>
+        </p>
       </div>
     </div>
   );
 }
 
+// ==========================================
 // MAIN EXPORT
+// ==========================================
 export default function BtrUltraApp() {
   const [currentPath, setCurrentPath] = useState('home');
   const [isScrolled, setIsScrolled] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('100k'); // For passing data to payment
+  const [selectedCategory, setSelectedCategory] = useState<CategoryId>('100k');
 
-  // Router internal
-  const navigate = (path, state = null) => {
-    if (state && state.category) setSelectedCategory(state.category);
+  const navigate: NavigateFn = (path, state) => {
+    if (state?.category) setSelectedCategory(state.category);
     setCurrentPath(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -1110,27 +1159,34 @@ export default function BtrUltraApp() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Parse info tab from path like "info-venue" → tab = "venue"
+  const getInfoTab = () => {
+    if (!currentPath.startsWith('info-')) return 'venue';
+    return currentPath.slice(5); // remove "info-"
+  };
+
   return (
     <div className="min-h-screen bg-black text-zinc-300 font-sans selection:bg-red-600 selection:text-white">
-      {/* NAVBAR */}
       <Navbar currentPath={currentPath} navigate={navigate} isScrolled={isScrolled} />
 
-      {/* MAIN ROUTING AREA */}
       <main className="pt-20 lg:pt-24 min-h-screen">
         {currentPath === 'home' && <HomeView navigate={navigate} />}
         {currentPath === 'register' && <RegisterView navigate={navigate} />}
         {currentPath === 'payment' && <PaymentView navigate={navigate} category={selectedCategory} />}
-        {currentPath.startsWith('category-') && <CategoryDetailView categoryId={currentPath.split('-')[1]} navigate={navigate} />}
-        {currentPath.startsWith('info-') && <RaceInfoView initialTab={currentPath.split('-')[1]} navigate={navigate} />}
-        {currentPath === 'results' && <ResultsView navigate={navigate} />}
-        {currentPath === 'gallery' && <GalleryPageView navigate={navigate} />}
+        {currentPath.startsWith('category-') && (
+          <CategoryDetailView categoryId={currentPath.replace('category-', '')} navigate={navigate} />
+        )}
+        {currentPath.startsWith('info-') && (
+          <RaceInfoView initialTab={getInfoTab()} navigate={navigate} />
+        )}
+        {currentPath === 'results' && <ResultsView />}
+        {currentPath === 'gallery' && <GalleryPageView />}
         {currentPath === 'news' && <NewsView navigate={navigate} />}
         {currentPath === 'news-detail' && <NewsDetailView navigate={navigate} />}
-        {currentPath === 'contact' && <ContactView navigate={navigate} />}
+        {currentPath === 'contact' && <ContactView />}
         {currentPath === 'login' && <LoginView navigate={navigate} />}
       </main>
 
-      {/* FOOTER */}
       <Footer navigate={navigate} />
     </div>
   );
