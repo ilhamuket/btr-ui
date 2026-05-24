@@ -1291,19 +1291,285 @@ function RaceInfoView({ initialTab, navigate }: RaceInfoViewProps) {
 // REGISTER VIEW
 // ==========================================
 function RegisterView({ navigate }: RegisterViewProps) {
-  const [formData, setFormData] = useState<{ category: CategoryId }>({ category: '100k' });
-  const handleProceed = (e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); navigate('payment', { category: formData.category }); };
+  const [formData, setFormData] = useState<{ category: CategoryId }>({ category: '30k' });
+  const [step, setStep] = useState(1);
+  const cat = categoriesData[formData.category];
+
+  const handleProceed = (e: React.FormEvent<HTMLFormElement>) => { 
+    e.preventDefault(); 
+    navigate('payment', { category: formData.category }); 
+  };
+
+  const inputClass = "w-full bg-black/80 border border-white/10 rounded-xl p-4 text-white text-sm placeholder:text-zinc-600 focus:border-red-500 focus:ring-1 focus:ring-red-500/30 focus:bg-black outline-none transition-all";
+  const labelClass = "block text-[10px] font-bold text-zinc-500 uppercase tracking-[0.15em] mb-2";
+  const selectClass = "w-full bg-black/80 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500/30 outline-none transition-all appearance-none cursor-pointer";
 
   return (
-    <div className="animate-fade-in max-w-5xl mx-auto px-4 py-16">
-      <div className="text-center mb-12"><h1 className="text-5xl font-black uppercase italic tracking-tighter text-white">Runner <span className="text-red-600">Registration</span></h1><p className="text-zinc-400 mt-4 text-lg">Please fill in your details completely for the official race registry.</p></div>
-      <div className="bg-zinc-950 border border-white/10 p-8 md:p-12 rounded-2xl shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-800 via-red-600 to-red-800"></div>
-        <form className="space-y-10" onSubmit={handleProceed}>
-          <div><h3 className="text-xl font-black uppercase text-white mb-6 flex items-center border-b border-white/10 pb-4"><Award className="text-red-600 mr-3" /> 1. Select Category</h3><div className="grid grid-cols-2 md:grid-cols-5 gap-4">{Object.values(categoriesData).map(c => (<label key={c.id} className={`cursor-pointer border rounded-xl p-4 text-center transition-all ${formData.category === c.id ? 'bg-red-600/10 border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)]' : 'bg-black border-white/10 hover:border-white/30'}`}><input type="radio" name="category" value={c.id} checked={formData.category === c.id} onChange={(e) => setFormData({...formData, category: e.target.value as CategoryId})} className="hidden" /><div className="font-black italic text-lg text-white">{c.name}</div><div className="text-[10px] text-zinc-400 font-bold uppercase mt-1">IDR {c.priceLocal}</div></label>))}</div></div>
-          <div><h3 className="text-xl font-black uppercase text-white mb-6 flex items-center border-b border-white/10 pb-4"><User className="text-red-600 mr-3" /> 2. Personal Information</h3><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">First Name *</label><input required type="text" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Last Name *</label><input required type="text" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Email *</label><input required type="email" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Phone (WhatsApp) *</label><input required type="tel" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">ID / Passport *</label><input required type="text" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">City (Asal Kota) *</label><input required type="text" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Community / Club</label><input type="text" placeholder="Optional" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">T-Shirt Size *</label><select required className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 outline-none appearance-none"><option value="">Select</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select></div></div></div>
-          <div><h3 className="text-xl font-black uppercase text-white mb-6 flex items-center border-b border-white/10 pb-4"><HeartPulse className="text-red-600 mr-3" /> 3. Medical & Emergency</h3><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Blood Type *</label><select required className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 outline-none appearance-none"><option value="">Select</option><option>A</option><option>B</option><option>AB</option><option>O</option></select></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Allergies / Medical</label><input type="text" placeholder="Leave blank if none" className="w-full bg-black border border-white/10 rounded-lg p-4 text-white focus:border-red-500 outline-none" /></div><div className="md:col-span-2 border border-red-900/30 bg-red-950/10 p-6 rounded-xl mt-2"><h4 className="text-red-500 font-bold uppercase text-xs tracking-widest mb-4">Emergency Contact</h4><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Name *</label><input required type="text" className="w-full bg-black border border-white/10 rounded-lg p-3 text-white focus:border-red-500 outline-none" /></div><div><label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Phone *</label><input required type="tel" className="w-full bg-black border border-white/10 rounded-lg p-3 text-white focus:border-red-500 outline-none" /></div></div></div></div></div>
-          <div className="pt-8 flex justify-end"><button type="submit" className="w-full md:w-auto bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black py-4 px-12 rounded-xl text-lg uppercase tracking-widest shadow-[0_10px_20px_rgba(220,38,38,0.3)] transition-all transform hover:-translate-y-1 flex items-center justify-center">Proceed to Payment <ArrowRight size={20} className="ml-3" /></button></div>
+    <div className="animate-fade-in">
+      {/* HERO HEADER */}
+      <div className="relative overflow-hidden -mt-24 pt-24">
+        <div className="absolute inset-0">
+          <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&q=80&w=2000" alt="Trail" className="w-full h-full object-cover opacity-20" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black"></div>
+        </div>
+        <div className="relative z-10 max-w-5xl mx-auto px-4 pt-12 pb-6 text-center">
+          <div className="inline-flex items-center bg-red-600/10 border border-red-600/30 rounded-full px-4 py-1.5 mb-6">
+            <Flame size={14} className="text-red-500 mr-2"/>
+            <span className="text-red-400 text-[10px] font-bold uppercase tracking-[0.2em]">Registration Open — Limited Slots</span>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-black uppercase italic tracking-tighter text-white mb-3">
+            Runner <span className="text-red-600">Registration</span>
+          </h1>
+          <p className="text-zinc-400 text-lg max-w-xl mx-auto">
+            Fill in your details to secure your spot at BTR Ultra 2026
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 pb-20 relative z-10">
+        {/* PROGRESS STEPS */}
+        <div className="flex items-center justify-center mb-12">
+          {[
+            { num: 1, label: 'Category' },
+            { num: 2, label: 'Personal Info' },
+            { num: 3, label: 'Emergency' },
+          ].map((s, idx) => (
+            <div key={s.num} className="flex items-center">
+              <button 
+                onClick={() => setStep(s.num)} 
+                className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all ${step === s.num ? 'bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.3)]' : step > s.num ? 'bg-red-600/20 text-red-400' : 'bg-zinc-900 text-zinc-500'}`}
+              >
+                <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${step === s.num ? 'bg-white text-red-600' : step > s.num ? 'bg-red-600/30 text-red-400' : 'bg-zinc-800 text-zinc-500'}`}>{step > s.num ? '✓' : s.num}</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider hidden sm:block">{s.label}</span>
+              </button>
+              {idx < 2 && <div className={`w-12 md:w-20 h-[2px] mx-2 ${step > s.num ? 'bg-red-600/50' : 'bg-zinc-800'}`}></div>}
+            </div>
+          ))}
+        </div>
+
+        <form onSubmit={handleProceed}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            {/* LEFT SIDEBAR — SELECTED CATEGORY SUMMARY */}
+            <div className="lg:col-span-1 order-2 lg:order-1">
+              <div className="bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden sticky top-28 shadow-2xl">
+                <div className="relative h-40 overflow-hidden">
+                  <img src={cat.img} alt={cat.name} className="w-full h-full object-cover opacity-60"/>
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                    <div className={`inline-block text-white px-4 py-0.5 italic transform -skew-x-12 shadow-md text-2xl font-black ${cat.color}`}>
+                      <span className="skew-x-12 block">{cat.name}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-5 space-y-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-500">Distance</span>
+                    <span className="font-bold text-white">{cat.dist}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-500">Elevation</span>
+                    <span className="font-bold text-white">{cat.elev}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-500">Cut-Off</span>
+                    <span className="font-bold text-white">{cat.cot}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-500">Start</span>
+                    <span className="font-bold text-white">{cat.startTime} WITA</span>
+                  </div>
+                  <div className="border-t border-white/10 pt-4 flex justify-between items-center">
+                    <span className="text-zinc-400 text-xs font-bold uppercase tracking-widest">Fee (Local)</span>
+                    <span className="font-black text-red-500 text-xl">IDR {cat.priceLocal}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-zinc-500">Fee (Foreign)</span>
+                    <span className="font-bold text-zinc-300">IDR {cat.priceForeign}</span>
+                  </div>
+                </div>
+                <div className="p-5 bg-black/50 border-t border-white/5">
+                  <div className="flex items-center text-[10px] text-zinc-500 uppercase tracking-wider">
+                    <ShieldCheck size={14} className="text-green-500 mr-2 shrink-0"/> Secure Registration
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT — FORM SECTIONS */}
+            <div className="lg:col-span-2 order-1 lg:order-2 space-y-8">
+
+              {/* ===== STEP 1: CATEGORY ===== */}
+              <div className={`bg-zinc-950 border border-white/10 rounded-2xl p-6 md:p-8 shadow-xl transition-all ${step === 1 ? '' : 'opacity-60'}`}>
+                <h3 className="text-lg font-black uppercase text-white mb-6 flex items-center">
+                  <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white text-xs font-black mr-3">1</div>
+                  Select Your Category
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {Object.values(categoriesData).map(c => (
+                    <label 
+                      key={c.id} 
+                      className={`cursor-pointer border rounded-xl p-5 transition-all relative overflow-hidden group ${formData.category === c.id ? 'border-red-500 bg-red-600/10 shadow-[0_0_20px_rgba(220,38,38,0.15)]' : 'bg-black border-white/10 hover:border-white/20'}`}
+                    >
+                      <input type="radio" name="category" value={c.id} checked={formData.category === c.id} onChange={(e) => setFormData({...formData, category: e.target.value as CategoryId})} className="hidden" />
+                      {formData.category === c.id && <div className="absolute top-3 right-3 w-5 h-5 bg-red-600 rounded-full flex items-center justify-center"><Check size={12} className="text-white"/></div>}
+                      <div className={`inline-block text-white px-3 py-0.5 italic transform -skew-x-12 shadow-md text-lg font-black mb-2 ${c.color}`}>
+                        <span className="skew-x-12 block">{c.name}</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-1">{c.dist} • {c.elev}</div>
+                      <div className="text-white font-bold text-sm mt-2">IDR {c.priceLocal}</div>
+                    </label>
+                  ))}
+                </div>
+                <div className="mt-6 flex justify-end">
+                  <button type="button" onClick={() => setStep(2)} className="bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-8 rounded-xl text-sm uppercase tracking-widest transition-all flex items-center">
+                    Continue <ArrowRight size={16} className="ml-2"/>
+                  </button>
+                </div>
+              </div>
+
+              {/* ===== STEP 2: PERSONAL INFORMATION ===== */}
+              <div className={`bg-zinc-950 border border-white/10 rounded-2xl p-6 md:p-8 shadow-xl transition-all ${step === 2 ? '' : step > 2 ? 'opacity-60' : 'opacity-40 pointer-events-none'}`}>
+                <h3 className="text-lg font-black uppercase text-white mb-6 flex items-center">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-black mr-3 ${step >= 2 ? 'bg-red-600' : 'bg-zinc-800'}`}>2</div>
+                  Personal Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {/* Full Name */}
+                  <div className="md:col-span-2">
+                    <label className={labelClass}>Full Name (Nama Lengkap) *</label>
+                    <input required type="text" placeholder="Enter your full name as on ID" className={inputClass} />
+                  </div>
+                  {/* BIB Name */}
+                  <div>
+                    <label className={labelClass}>BIB Name (Nama di BIB) *</label>
+                    <input required type="text" placeholder="Name displayed on your BIB" maxLength={15} className={inputClass} />
+                    <p className="text-zinc-600 text-[9px] mt-1.5 uppercase tracking-wider">Max 15 characters</p>
+                  </div>
+                  {/* NIK */}
+                  <div>
+                    <label className={labelClass}>NIK (No. KTP / Passport) *</label>
+                    <input required type="text" placeholder="ID number" className={inputClass} />
+                  </div>
+                  {/* Birth Date */}
+                  <div>
+                    <label className={labelClass}>Date of Birth *</label>
+                    <input required type="date" className={`${inputClass} [color-scheme:dark]`} />
+                  </div>
+                  {/* Gender */}
+                  <div>
+                    <label className={labelClass}>Gender *</label>
+                    <div className="flex gap-3">
+                      <label className="flex-1 cursor-pointer">
+                        <input type="radio" name="gender" value="male" className="hidden peer" required />
+                        <div className="peer-checked:border-red-500 peer-checked:bg-red-600/10 border border-white/10 bg-black/80 rounded-xl p-4 text-center transition-all hover:border-white/20">
+                          <span className="text-white text-sm font-bold">Male</span>
+                        </div>
+                      </label>
+                      <label className="flex-1 cursor-pointer">
+                        <input type="radio" name="gender" value="female" className="hidden peer" />
+                        <div className="peer-checked:border-red-500 peer-checked:bg-red-600/10 border border-white/10 bg-black/80 rounded-xl p-4 text-center transition-all hover:border-white/20">
+                          <span className="text-white text-sm font-bold">Female</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  {/* Age */}
+                  <div>
+                    <label className={labelClass}>Age *</label>
+                    <input required type="number" min={18} max={99} placeholder="Your age on race day" className={inputClass} />
+                  </div>
+                  {/* Email */}
+                  <div>
+                    <label className={labelClass}>Email Address *</label>
+                    <input required type="email" placeholder="your@email.com" className={inputClass} />
+                  </div>
+                  {/* Phone */}
+                  <div>
+                    <label className={labelClass}>Phone / WhatsApp *</label>
+                    <input required type="tel" placeholder="+62 8xx xxxx xxxx" className={inputClass} />
+                  </div>
+                  {/* Address */}
+                  <div className="md:col-span-2">
+                    <label className={labelClass}>Address (Alamat Lengkap) *</label>
+                    <input required type="text" placeholder="Street address" className={inputClass} />
+                  </div>
+                  {/* City */}
+                  <div>
+                    <label className={labelClass}>City (Kota) *</label>
+                    <input required type="text" placeholder="Your city" className={inputClass} />
+                  </div>
+                  {/* Jersey Size */}
+                  <div>
+                    <label className={labelClass}>Jersey Size *</label>
+                    <div className="grid grid-cols-6 gap-2">
+                      {['XS','S','M','L','XL','XXL'].map(sz => (
+                        <label key={sz} className="cursor-pointer">
+                          <input type="radio" name="jersey" value={sz} className="hidden peer" required />
+                          <div className="peer-checked:border-red-500 peer-checked:bg-red-600/10 peer-checked:text-white border border-white/10 bg-black/80 rounded-lg py-3 text-center text-sm font-bold text-zinc-400 transition-all hover:border-white/20">
+                            {sz}
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-between">
+                  <button type="button" onClick={() => setStep(1)} className="text-zinc-500 hover:text-white font-bold py-3 px-6 rounded-xl text-sm uppercase tracking-widest transition-all flex items-center">
+                    <ArrowLeft size={16} className="mr-2"/> Back
+                  </button>
+                  <button type="button" onClick={() => setStep(3)} className="bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-8 rounded-xl text-sm uppercase tracking-widest transition-all flex items-center">
+                    Continue <ArrowRight size={16} className="ml-2"/>
+                  </button>
+                </div>
+              </div>
+
+              {/* ===== STEP 3: EMERGENCY CONTACT ===== */}
+              <div className={`bg-zinc-950 border border-white/10 rounded-2xl p-6 md:p-8 shadow-xl transition-all ${step === 3 ? '' : 'opacity-40 pointer-events-none'}`}>
+                <h3 className="text-lg font-black uppercase text-white mb-6 flex items-center">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-black mr-3 ${step >= 3 ? 'bg-red-600' : 'bg-zinc-800'}`}>3</div>
+                  Emergency Contact
+                </h3>
+
+                <div className="bg-yellow-950/20 border border-yellow-800/30 rounded-xl p-4 mb-6 flex items-start">
+                  <AlertTriangle size={18} className="text-yellow-500 mr-3 mt-0.5 shrink-0"/>
+                  <p className="text-yellow-200/70 text-xs">Please provide a contact person who is NOT participating in the race and can be reached in case of emergency.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className={labelClass}>Emergency Contact Name *</label>
+                    <input required type="text" placeholder="Full name of contact person" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Emergency Contact Phone *</label>
+                    <input required type="tel" placeholder="+62 8xx xxxx xxxx" className={inputClass} />
+                  </div>
+                </div>
+
+                {/* AGREEMENT */}
+                <div className="mt-8 bg-black/50 border border-white/5 rounded-xl p-5 space-y-4">
+                  <label className="flex items-start cursor-pointer group">
+                    <input type="checkbox" required className="mt-1 mr-3 accent-red-600 w-4 h-4 shrink-0"/>
+                    <span className="text-zinc-400 text-xs group-hover:text-zinc-300 transition-colors">I confirm that all information provided is accurate. I have read and agree to the <span className="text-red-500">Rules & Regulations</span>, <span className="text-red-500">Terms & Conditions</span>, and <span className="text-red-500">Waiver of Liability</span>.</span>
+                  </label>
+                  <label className="flex items-start cursor-pointer group">
+                    <input type="checkbox" required className="mt-1 mr-3 accent-red-600 w-4 h-4 shrink-0"/>
+                    <span className="text-zinc-400 text-xs group-hover:text-zinc-300 transition-colors">I declare that I am physically fit to participate in this trail running event and accept all risks involved.</span>
+                  </label>
+                </div>
+
+                <div className="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <button type="button" onClick={() => setStep(2)} className="text-zinc-500 hover:text-white font-bold py-3 px-6 rounded-xl text-sm uppercase tracking-widest transition-all flex items-center">
+                    <ArrowLeft size={16} className="mr-2"/> Back
+                  </button>
+                  <button type="submit" className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-black py-4 px-12 rounded-xl text-lg uppercase tracking-[0.15em] shadow-[0_10px_30px_rgba(220,38,38,0.3)] transition-all transform hover:-translate-y-1 flex items-center justify-center">
+                    <Wallet size={20} className="mr-3"/> Proceed to Payment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </form>
       </div>
     </div>
@@ -1358,18 +1624,245 @@ function PaymentView({ navigate, category }: PaymentViewProps) {
 // RESULTS VIEW
 // ==========================================
 function ResultsView() {
-  const dummyResults = [
-    { rank: 1, name: 'BUL SUGIARTO', bib: '2440', time: '14:33:00', cat: '100K Male', country: 'IDN' },
-    { rank: 2, name: 'THETA WARDAN', bib: '2441', time: '16:43:31', cat: '100K Male', country: 'IDN' },
-    { rank: 3, name: 'MENDRA WANT', bib: '2442', time: '18:30:25', cat: '100K Male', country: 'IDN' },
-    { rank: 4, name: 'MOHD PARIVE BI', bib: '2443', time: '21:40:40', cat: '100K Male', country: 'MYS' },
-  ];
+  const [activeCategory, setActiveCategory] = useState('100k');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  interface ResultEntry {
+    rank: number;
+    name: string;
+    bib: string;
+    time: string;
+    cat: string;
+    country: string;
+    age: number;
+    gender: string;
+    pace: string;
+  }
+
+  const allResults: Record<string, ResultEntry[]> = {
+    '100k': [
+      { rank: 1, name: 'BUL SUGIARTO', bib: '2440', time: '14:33:00', cat: '100K Male', country: 'IDN', age: 32, gender: 'M', pace: '8:13/km' },
+      { rank: 2, name: 'THETA WARDAN', bib: '2441', time: '16:43:31', cat: '100K Male', country: 'IDN', age: 28, gender: 'M', pace: '9:27/km' },
+      { rank: 3, name: 'MENDRA WANT', bib: '2442', time: '18:30:25', cat: '100K Male', country: 'IDN', age: 35, gender: 'M', pace: '10:27/km' },
+      { rank: 4, name: 'MOHD PARIVE BI', bib: '2443', time: '21:40:40', cat: '100K Male', country: 'MYS', age: 41, gender: 'M', pace: '12:15/km' },
+      { rank: 5, name: 'HENDRA KUSUMA', bib: '2444', time: '22:15:12', cat: '100K Male', country: 'IDN', age: 38, gender: 'M', pace: '12:34/km' },
+      { rank: 6, name: 'SARAH TANAKA', bib: '2501', time: '23:10:45', cat: '100K Female', country: 'JPN', age: 29, gender: 'F', pace: '13:05/km' },
+      { rank: 7, name: 'DEWI LESTARI', bib: '2502', time: '24:45:30', cat: '100K Female', country: 'IDN', age: 33, gender: 'F', pace: '13:59/km' },
+      { rank: 8, name: 'RICKY PRATAMA', bib: '2445', time: '25:30:00', cat: '100K Male', country: 'IDN', age: 45, gender: 'M', pace: '14:24/km' },
+    ],
+    '60k': [
+      { rank: 1, name: 'AGUS SETIAWAN', bib: '3201', time: '07:22:15', cat: '60K Male', country: 'IDN', age: 30, gender: 'M', pace: '7:12/km' },
+      { rank: 2, name: 'YUKI NAKAMURA', bib: '3202', time: '08:05:40', cat: '60K Male', country: 'JPN', age: 27, gender: 'M', pace: '7:55/km' },
+      { rank: 3, name: 'DANI CHIKA', bib: '3203', time: '08:44:10', cat: '60K Female', country: 'IDN', age: 26, gender: 'F', pace: '8:33/km' },
+      { rank: 4, name: 'WAYAN SURYA', bib: '3204', time: '09:15:00', cat: '60K Male', country: 'IDN', age: 34, gender: 'M', pace: '9:03/km' },
+      { rank: 5, name: 'LEE MIN HO', bib: '3205', time: '10:30:22', cat: '60K Male', country: 'KOR', age: 31, gender: 'M', pace: '10:17/km' },
+    ],
+    '30k': [
+      { rank: 1, name: 'RIZKI RAMADHAN', bib: '4101', time: '03:15:45', cat: '30K Male', country: 'IDN', age: 25, gender: 'M', pace: '6:46/km' },
+      { rank: 2, name: 'PUTU ADITYA', bib: '4102', time: '03:32:10', cat: '30K Male', country: 'IDN', age: 29, gender: 'M', pace: '7:20/km' },
+      { rank: 3, name: 'ANNA SMITH', bib: '4201', time: '03:55:22', cat: '30K Female', country: 'AUS', age: 31, gender: 'F', pace: '8:08/km' },
+      { rank: 4, name: 'KADEK SURYA', bib: '4103', time: '04:10:00', cat: '30K Male', country: 'IDN', age: 37, gender: 'M', pace: '8:39/km' },
+    ],
+  };
+
+  const results = allResults[activeCategory] || [];
+  const filtered = searchTerm 
+    ? results.filter(r => r.name.toLowerCase().includes(searchTerm.toLowerCase()) || r.bib.includes(searchTerm))
+    : results;
+  const podium = results.slice(0, 3);
+  const totalFinishers = results.length;
+  const catLabel = activeCategory.toUpperCase();
+
   return (
-    <div className="animate-fade-in max-w-7xl mx-auto px-4 py-16">
-      <div className="text-center mb-12"><h1 className="text-5xl md:text-6xl font-black uppercase italic tracking-tighter text-white mb-4">Race <span className="text-red-600">Results</span></h1><p className="text-zinc-400 font-light text-lg">Official Leaderboard BTR Ultra 2025</p></div>
-      <div className="bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="p-6 md:p-8 bg-black border-b border-white/10 flex flex-col md:flex-row justify-between items-center gap-4"><select className="bg-zinc-900 border border-white/20 text-white p-3 rounded-lg text-sm font-bold outline-none focus:border-red-500 w-full md:w-auto uppercase tracking-wider"><option>100K Category</option><option>60K Category</option></select><div className="relative w-full md:w-96"><Search size={18} className="absolute left-4 top-3.5 text-zinc-500"/><input type="text" placeholder="Search runner name or BIB..." className="w-full bg-zinc-900 border border-white/20 text-white p-3 pl-12 rounded-lg text-sm outline-none focus:border-red-500 transition-colors"/></div></div>
-        <div className="overflow-x-auto"><table className="w-full text-left border-collapse min-w-[800px]"><thead><tr className="bg-zinc-900 text-red-500 text-[10px] font-black uppercase tracking-[0.2em] border-b border-white/10"><th className="p-6 w-24 text-center">Rank</th><th className="p-6">Runner</th><th className="p-6">BIB</th><th className="p-6">Category</th><th className="p-6 text-right">Finish Time</th></tr></thead><tbody className="text-sm font-semibold">{dummyResults.map((r) => (<tr key={r.rank} className="border-b border-white/5 hover:bg-white/5 transition-colors"><td className="p-6 text-center text-zinc-400 font-black text-lg">#{r.rank}</td><td className="p-6 text-white text-base">{r.name} <span className="ml-2 bg-white/10 text-[9px] px-2 py-0.5 rounded text-zinc-300">{r.country}</span></td><td className="p-6 text-zinc-500">{r.bib}</td><td className="p-6 text-zinc-400">{r.cat}</td><td className="p-6 text-right text-red-500 font-black tracking-wider">{r.time}</td></tr>))}</tbody></table></div>
+    <div className="animate-fade-in">
+      {/* HERO */}
+      <div className="relative overflow-hidden -mt-24 pt-24">
+        <div className="absolute inset-0">
+          <img src="https://images.unsplash.com/photo-1533202998083-d52ec1eb311b?auto=format&fit=crop&q=80&w=2000" alt="Finish line" className="w-full h-full object-cover opacity-15"/>
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black"></div>
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 pt-12 pb-8 text-center">
+          <div className="inline-flex items-center bg-red-600/10 border border-red-600/30 rounded-full px-4 py-1.5 mb-4">
+            <Trophy size={14} className="text-red-500 mr-2"/>
+            <span className="text-red-400 text-[10px] font-bold uppercase tracking-[0.2em]">Official Results — BTR Ultra 2025</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-white mb-3">
+            Race <span className="text-red-600">Results</span>
+          </h1>
+          <p className="text-zinc-400 text-lg">Leaderboard • Finisher Times • Statistics</p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 pb-20 relative z-10">
+        {/* CATEGORY TABS */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          {['100k', '60k', '30k'].map(catId => (
+            <button
+              key={catId}
+              onClick={() => { setActiveCategory(catId); setSearchTerm(''); }}
+              className={`px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest transition-all ${activeCategory === catId ? 'bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.3)]' : 'bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white hover:border-white/20'}`}
+            >
+              {catId.toUpperCase()} Category
+            </button>
+          ))}
+        </div>
+
+        {/* PODIUM SECTION */}
+        {podium.length >= 3 && (
+          <div className="mb-12">
+            <div className="flex items-end justify-center gap-3 md:gap-6 max-w-3xl mx-auto">
+              {/* 2nd Place */}
+              <div className="flex-1 max-w-[200px]">
+                <div className="text-center mb-3">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-zinc-300 to-zinc-500 mx-auto flex items-center justify-center text-black font-black text-xl shadow-lg border-2 border-zinc-400">2</div>
+                  <h4 className="text-white font-bold text-sm mt-2 truncate">{podium[1].name}</h4>
+                  <div className="text-zinc-400 text-[10px] uppercase tracking-widest">{podium[1].country}</div>
+                </div>
+                <div className="bg-gradient-to-t from-zinc-700 to-zinc-600 rounded-t-xl h-28 md:h-32 flex flex-col items-center justify-end pb-4 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.1),transparent)]"></div>
+                  <span className="text-white font-black text-sm md:text-lg tracking-wider relative z-10">{podium[1].time}</span>
+                  <span className="text-zinc-300 text-[9px] uppercase tracking-widest relative z-10">BIB {podium[1].bib}</span>
+                </div>
+              </div>
+              {/* 1st Place */}
+              <div className="flex-1 max-w-[220px]">
+                <div className="text-center mb-3">
+                  <div className="w-18 h-18 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 mx-auto flex items-center justify-center text-black font-black text-2xl shadow-[0_0_30px_rgba(245,158,11,0.4)] border-2 border-yellow-400" style={{width: '4.5rem', height: '4.5rem'}}>
+                    <Trophy size={28}/>
+                  </div>
+                  <h4 className="text-white font-black text-base md:text-lg mt-2 truncate">{podium[0].name}</h4>
+                  <div className="text-yellow-500 text-[10px] uppercase tracking-widest font-bold">{podium[0].country} • Champion</div>
+                </div>
+                <div className="bg-gradient-to-t from-yellow-700 to-amber-600 rounded-t-xl h-36 md:h-44 flex flex-col items-center justify-end pb-4 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.2),transparent)]"></div>
+                  <span className="text-white font-black text-lg md:text-2xl tracking-wider relative z-10">{podium[0].time}</span>
+                  <span className="text-yellow-200 text-[9px] uppercase tracking-widest relative z-10">BIB {podium[0].bib}</span>
+                </div>
+              </div>
+              {/* 3rd Place */}
+              <div className="flex-1 max-w-[200px]">
+                <div className="text-center mb-3">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 mx-auto flex items-center justify-center text-white font-black text-xl shadow-lg border-2 border-amber-700">3</div>
+                  <h4 className="text-white font-bold text-sm mt-2 truncate">{podium[2].name}</h4>
+                  <div className="text-zinc-400 text-[10px] uppercase tracking-widest">{podium[2].country}</div>
+                </div>
+                <div className="bg-gradient-to-t from-amber-900 to-amber-800 rounded-t-xl h-24 md:h-28 flex flex-col items-center justify-end pb-4 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.1),transparent)]"></div>
+                  <span className="text-white font-black text-sm md:text-lg tracking-wider relative z-10">{podium[2].time}</span>
+                  <span className="text-amber-300 text-[9px] uppercase tracking-widest relative z-10">BIB {podium[2].bib}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STATS ROW */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-zinc-950 border border-white/10 rounded-xl p-5 text-center">
+            <div className="text-3xl font-black text-white">{totalFinishers}</div>
+            <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Total Finishers</div>
+          </div>
+          <div className="bg-zinc-950 border border-white/10 rounded-xl p-5 text-center">
+            <div className="text-3xl font-black text-red-500">{podium[0]?.time.split(':')[0]}h</div>
+            <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Fastest Time</div>
+          </div>
+          <div className="bg-zinc-950 border border-white/10 rounded-xl p-5 text-center">
+            <div className="text-3xl font-black text-white">{catLabel}</div>
+            <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Category</div>
+          </div>
+          <div className="bg-zinc-950 border border-white/10 rounded-xl p-5 text-center">
+            <div className="text-3xl font-black text-white">{results.filter(r => r.gender === 'F').length}</div>
+            <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Female Finishers</div>
+          </div>
+        </div>
+
+        {/* SEARCH BAR */}
+        <div className="bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+          <div className="p-5 md:p-6 bg-black/50 border-b border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <h3 className="text-white font-black uppercase tracking-widest text-sm flex items-center">
+              <Award size={18} className="text-red-500 mr-2"/> Full Leaderboard — {catLabel}
+            </h3>
+            <div className="relative w-full md:w-96">
+              <Search size={18} className="absolute left-4 top-3.5 text-zinc-500"/>
+              <input 
+                type="text" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search runner name or BIB..." 
+                className="w-full bg-zinc-900 border border-white/10 text-white p-3 pl-12 rounded-xl text-sm outline-none focus:border-red-500 transition-colors placeholder:text-zinc-600"
+              />
+            </div>
+          </div>
+
+          {/* TABLE */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[900px]">
+              <thead>
+                <tr className="bg-zinc-900/50 text-[10px] font-black uppercase tracking-[0.15em] border-b border-white/10">
+                  <th className="p-5 w-20 text-center text-zinc-500">Rank</th>
+                  <th className="p-5 text-zinc-500">Runner</th>
+                  <th className="p-5 text-zinc-500">BIB</th>
+                  <th className="p-5 text-zinc-500 text-center">Gender</th>
+                  <th className="p-5 text-zinc-500 text-center">Age</th>
+                  <th className="p-5 text-zinc-500">Category</th>
+                  <th className="p-5 text-zinc-500 text-right">Avg Pace</th>
+                  <th className="p-5 text-zinc-500 text-right">Finish Time</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {filtered.map((r) => (
+                  <tr key={r.rank} className={`border-b border-white/5 hover:bg-white/5 transition-colors ${r.rank <= 3 ? 'bg-zinc-900/20' : ''}`}>
+                    <td className="p-5 text-center">
+                      {r.rank === 1 ? (
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 text-black font-black text-xs">1</span>
+                      ) : r.rank === 2 ? (
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-zinc-300 to-zinc-500 text-black font-black text-xs">2</span>
+                      ) : r.rank === 3 ? (
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 text-white font-black text-xs">3</span>
+                      ) : (
+                        <span className="text-zinc-500 font-bold">{r.rank}</span>
+                      )}
+                    </td>
+                    <td className="p-5">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 text-[10px] font-bold mr-3 shrink-0">{r.country}</div>
+                        <div>
+                          <div className="text-white font-bold">{r.name}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-5 text-zinc-400 font-mono text-xs">{r.bib}</td>
+                    <td className="p-5 text-center">
+                      <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold uppercase ${r.gender === 'M' ? 'bg-blue-900/30 text-blue-400' : 'bg-pink-900/30 text-pink-400'}`}>
+                        {r.gender === 'M' ? 'Male' : 'Female'}
+                      </span>
+                    </td>
+                    <td className="p-5 text-center text-zinc-400">{r.age}</td>
+                    <td className="p-5 text-zinc-400 text-xs">{r.cat}</td>
+                    <td className="p-5 text-right text-zinc-500 font-mono text-xs">{r.pace}</td>
+                    <td className="p-5 text-right">
+                      <span className={`font-black tracking-wider ${r.rank <= 3 ? 'text-red-500 text-base' : 'text-zinc-300'}`}>{r.time}</span>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="p-12 text-center text-zinc-500">
+                      <Search size={32} className="mx-auto mb-3 text-zinc-700"/>
+                      <p className="font-bold">No runners found matching "{searchTerm}"</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* FOOTER */}
+          <div className="p-5 bg-black/50 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center text-[10px] text-zinc-500 uppercase tracking-widest">
+            <span>Showing {filtered.length} of {results.length} finishers</span>
+            <span>Results are unofficial until certified by ITRA</span>
+          </div>
+        </div>
       </div>
     </div>
   );
