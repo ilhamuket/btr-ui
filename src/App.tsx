@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { 
   Menu, X, Search, Play, MapPin, Calendar, Check, X as XIcon, 
   Download, Info, ChevronDown, User, Lock, Mail, Phone, FileText, Award, 
-  AlertTriangle, ArrowRight, ArrowLeft, HeartPulse, Shirt, CreditCard, 
+  AlertTriangle, ArrowRight, ArrowLeft, Shirt, CreditCard, 
   Wallet, ShieldCheck, Box, Clock, Mountain, Droplets, Trophy, Users, 
   Flag, MapPinned, Route, List, Tent, Star, CircleAlert, Ban, 
   Stethoscope, Milestone, Scale, Gavel, HandHelping, Flame, Footprints
@@ -1302,7 +1302,6 @@ function RegisterView({ navigate }: RegisterViewProps) {
 
   const inputClass = "w-full bg-black/80 border border-white/10 rounded-xl p-4 text-white text-sm placeholder:text-zinc-600 focus:border-red-500 focus:ring-1 focus:ring-red-500/30 focus:bg-black outline-none transition-all";
   const labelClass = "block text-[10px] font-bold text-zinc-500 uppercase tracking-[0.15em] mb-2";
-  const selectClass = "w-full bg-black/80 border border-white/10 rounded-xl p-4 text-white text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500/30 outline-none transition-all appearance-none cursor-pointer";
 
   return (
     <div className="animate-fade-in">
